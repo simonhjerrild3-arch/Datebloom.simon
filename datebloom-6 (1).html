@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DateBloom 🌸</title>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:radial-gradient(circle at top,#fff 0,#fff3f7 45%,#ffdce9 100%);color:#3b2630;overflow:hidden}
+.wrap{min-height:100vh;display:grid;place-items:center;padding:24px}.card{width:min(430px,100%);padding:38px 26px 34px;text-align:center;background:rgba(255,255,255,.82);border:1px solid rgba(255,255,255,.9);border-radius:32px;box-shadow:0 20px 70px rgba(163,65,104,.18);backdrop-filter:blur(12px);position:relative;z-index:2}
+.flower{font-size:58px;animation:float 3s ease-in-out infinite}.brand{font-weight:800;letter-spacing:.12em;color:#c64d7b;font-size:13px;margin-top:8px}.title{font-size:clamp(31px,8vw,42px);line-height:1.05;margin:15px 0 12px;font-weight:850}.sub{font-size:16px;line-height:1.5;color:#795966;margin:0 auto 26px;max-width:330px}
+.buttons{display:flex;gap:12px;justify-content:center;min-height:58px;position:relative}.btn{border:0;border-radius:999px;padding:16px 25px;font-size:16px;font-weight:800;cursor:pointer;transition:.2s;box-shadow:0 8px 22px rgba(122,45,79,.14)}.yes{background:#d94f83;color:white}.yes:hover{transform:translateY(-2px) scale(1.03)}.no{background:#fff0f5;color:#9d5a72;position:relative}
+.hidden{display:none}.success h2{font-size:35px;margin:10px 0}.success p{color:#795966;line-height:1.55}.datebox{margin:22px 0;padding:18px;border-radius:22px;background:#fff0f5;text-align:left}.datebox strong{display:block;color:#c64d7b;margin-bottom:5px}.small{font-size:13px;color:#9a7180}
+.heart{position:fixed;bottom:-30px;font-size:22px;animation:rise 5s linear forwards;opacity:.75;z-index:1}@keyframes rise{to{transform:translateY(-110vh) rotate(360deg);opacity:0}}@keyframes float{50%{transform:translateY(-7px) rotate(3deg)}}
+.footer{margin-top:24px;font-size:11px;color:#b08796}.again{margin-top:10px;background:none;border:0;color:#c64d7b;font-weight:700;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <main class="card">
+    <section id="question">
+      <div class="flower">🌸</div>
+      <div class="brand">DATEBLOOM</div>
+      <h1 class="title">Vil du på date med mig?</h1>
+      <p class="sub">Jeg har et vigtigt spørgsmål til dig… og jeg håber virkelig, du siger ja. 🥹❤️</p>
+      <div class="buttons">
+        <button class="btn yes" id="yes">JA! ❤️</button>
+        <button class="btn no" id="no">Nej 🙈</button>
+      </div>
+      <div class="footer">En lille invitation fra din yndlingsperson ✨</div>
+    </section>
+
+    <section id="booking" class="hidden">
+      <div class="flower">🌸</div>
+      <div class="brand">DATEBLOOM</div>
+      <h2>Så skal vi bare planlægge den ❤️</h2>
+      <p class="sub">Vælg, hvad du har mest lyst til — resten klarer jeg. 🥰</p>
+      <div class="form">
+        <label>📅 Vælg dato
+          <input id="date" type="date" required>
+        </label>
+        <label>🍽️ Hvad skal vi spise?
+          <select id="food">
+            <option value="">Vælg en mulighed…</option>
+            <option>🍕 Pizza</option>
+            <option>🍔 Burger</option>
+            <option>🥩 Steak</option>
+            <option>🍣 Sushi</option>
+            <option>🍝 Italiensk</option>
+            <option>🌮 Mexicansk</option>
+            <option>🥘 Noget hyggeligt og lækkert</option>
+          </select>
+        </label>
+        <label>🕐 Hvad tid?
+          <input id="time" type="time" required>
+        </label>
+      </div>
+      <button class="btn yes confirm" id="confirm">Bekræft daten ❤️</button>
+      <p id="error" class="error hidden">Vælg lige dato, mad og tidspunkt først 🥰</p>
+    </section>
+
+    <section id="success" class="success hidden">
+      <div class="flower">💐</div>
+      <div class="brand">DATEBLOOM</div>
+      <h2>DATE BEKRÆFTET! ❤️</h2>
+      <p>Din bestilling er gået igennem. Jeg glæder mig helt vildt til vores date! 🥰</p>
+      <div class="receipt">
+        <div class="receipt-top">DATEBLOOM <span>✓</span></div>
+        <div class="line"><span>📅 Dato</span><strong id="dateText"></strong></div>
+        <div class="line"><span>🍽️ Mad</span><strong id="foodText"></strong></div>
+        <div class="line"><span>🕐 Tid</span><strong id="timeText"></strong></div>
+        <div class="total">❤️ 1 DATE FOR 2 PERSONER ❤️</div>
+      </div>
+      <p class="small">Ordrenummer: <strong id="orderNo"></strong></p>
+      <button class="again" onclick="location.reload()">Lav en ny bestilling 🌸</button>
+    </section>
+  </main>
+</div>
+<script>
+const no=document.getElementById('no'), yes=document.getElementById('yes');
+const booking=document.getElementById('booking'), confirm=document.getElementById('confirm');
+const date=document.getElementById('date'), food=document.getElementById('food'), time=document.getElementById('time'), error=document.getElementById('error');
+const dateText=document.getElementById('dateText'), foodText=document.getElementById('foodText'), timeText=document.getElementById('timeText'), orderNo=document.getElementById('orderNo');
+const q=document.getElementById('question'), s=document.getElementById('success');
+let tries=0;
+function moveNo(){
+  tries++;
+  const x=(Math.random()*180)-90, y=(Math.random()*90)-45;
+  no.style.transform=`translate(${x}px,${y}px)`;
+  if(tries>2) no.textContent=['Er du sikker? 😳','Prøv igen 🙈','Du kan ikke slippe! 😂','JA er vist den eneste mulighed 😌'][Math.min(tries-3,3)];
+}
+no.addEventListener('mouseenter',moveNo);
+no.addEventListener('touchstart',e=>{e.preventDefault();moveNo()});
+no.addEventListener('click',moveNo);
+yes.addEventListener('click',()=>{
+  q.classList.add('hidden');booking.classList.remove('hidden');
+  date.min = new Date().toISOString().split('T')[0];
+});
+confirm.addEventListener('click',()=>{
+  if(!date.value || !food.value || !time.value){
+    error.classList.remove('hidden'); return;
+  }
+  error.classList.add('hidden');
+  const d=new Date(date.value+"T12:00:00");
+  dateText.textContent=d.toLocaleDateString('da-DK',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  foodText.textContent=food.value;
+  timeText.textContent=time.value;
+  orderNo.textContent="DB-"+Math.floor(100000+Math.random()*900000);
+  booking.classList.add('hidden');s.classList.remove('hidden');
+  for(let i=0;i<28;i++) setTimeout(spawnHeart,i*90);
+});
+function spawnHeart(){
+ const h=document.createElement('div');h.className='heart';h.textContent=['❤️','💗','🌸','💕'][Math.floor(Math.random()*4)];
+ h.style.left=Math.random()*100+'vw';h.style.animationDuration=(3+Math.random()*3)+'s';h.style.fontSize=(16+Math.random()*18)+'px';
+ document.body.appendChild(h);setTimeout(()=>h.remove(),6500);
+}
+</script>
+</body>
+</html>
